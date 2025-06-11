@@ -1,0 +1,86 @@
+instrument { name = 'ImpuseSystem 2022 @efraimTraders',
+   icon = 'https://cdn.pixabay.com/photo/2015/10/01/17/17/car-967387__340.png',
+    overlay = true
+}
+
+percentage = input (1, "Percentage", input.double, 1, 100, 3) / 100
+period = 5
+
+
+input_group {
+    "front.ind.dpo.generalline",
+    up_color = input { default = "", type = input.color },
+     width = input { default = 1, type = input.line_width },
+    visiblepercentage = input { default = false, type = input.plot_visibility }
+}
+
+input_group {
+    "front.ind.dpo.generalline",
+    down_color = input { default = "", type = input.color },
+     width = input { default = 1, type = input.line_width },
+    visiblepercentage = input { default = false, type = input.plot_visibility }
+}
+
+input_group {"CALL", call_color= input{ default= "rgba(0, 250, 154, 0.80)", type= input.color}}
+
+input_group {"PUT", put_color= input{ default= "rgba(220, 20, 60, 0.8)", type= input.color}}
+
+
+local reference = make_series ()
+reference:set(nz(reference[1], high))
+local is_direction_up = make_series ()
+is_direction_up:set(nz(is_direction_up[1], true))
+local htrack = make_series ()
+local ltrack = make_series ()
+local pivot = make_series ()
+reverse_range = reference * percentage / 100
+if get_value (is_direction_up) then
+    htrack:set (max(high, nz(htrack[1], high)))
+    if close < htrack[1] - reverse_range then
+        pivot:set (htrack)
+        is_direction_up:set (false)
+        reference:set(htrack)
+    end
+else
+    ltrack:set (min(low, nz(ltrack[1], low)))
+    if close > ltrack[1] + reverse_range then
+        pivot:set (ltrack)
+        is_direction_up:set(true)
+        reference:set (ltrack)
+    end
+end
+color = is_direction_up() and  up_color or down_color
+plot(pivot, 'ZZ', color, width, -1, style.solid_line, na_mode.continue)
+
+
+
+smaa= sma(close, '1')
+upper_high= smaa + (stdev(close,10) *1 )
+lower_high= smaa - (stdev(close,10) *1 )
+emaa= ema(close, '')
+
+if Exibir_tracamento == 1 then
+plot(emaa, "SMA", ema_color)
+plot(upper_high, "UPPER_HIGH", sup_color)
+plot(lower_high, "LOWER_HIGH", inf_color)
+end
+
+plot_shape((high >= upper_high and emaa > upper_high),
+"PUT",
+shape_style.arrowdown,
+shape_size.huge,
+put_color,
+shape_location.abovebar,
+0,
+"VENDA",
+put_color)
+
+plot_shape((low <= lower_high and emaa < lower_high),
+"CALL",
+shape_style.arrowup,
+shape_size.huge,
+call_color,
+shape_location.belowbar,
+0,
+"COMPRA",
+call_color)

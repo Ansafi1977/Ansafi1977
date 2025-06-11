@@ -1,0 +1,33 @@
+instrument{name="PriceAction2023raimTraders", 
+short_name="PriceAction2023@Efraim traders ", 
+icon="https://efraimtraders.com/wp-content/uploads/2022/03/Touro.png", overlay= True}   
+method_id = input (1, "", input.string_selection, { "" })
+local function a()local 
+b=make_series()local c=high[2]
+if not get_value(c)then 
+return b end;
+local d=high<=c and high[1]<=c and high[3]<=c and high[4]<=c;
+b:set(iff(d,c,b[1]))return b end;
+local function e()local b=make_series()local c=low[2]if not get_value(c)then return b end;
+local d=low>=c and low[1]>=c and low[3]>=c and low[4]>=c;
+b:set(iff(d,c,b[1]))return b end;
+input_group{"Color",color=input{default="yellow",type=input.color},
+width=input{default=1,type=input.line_width}}
+h=a()l=e()
+hline(h,"High",color,high_width)
+hline(l,"Low",color,width)
+hline(highest(10)[1],"HH10",color,1)hline(lowest(10)[1],"LL10",color,1)
+hline(highest(30)[1],"HH30",color,1)
+hline(lowest(30)[1],"LL30",color,1)
+hline(highest(60)[1],"HH60",color,1)
+input_group {
+    "KEY CHAVE", 
+    Chave_de_Ativacao = input {default = "@RichardDrigues", type = input.string} 
+}
+hline(lowest(60)[1],"LL60",color,1)
+hline(highest(100)[1],"HH100",color,1)
+hline(lowest(100)[1],"LL100",color,1)
+hline(highest(150)[1],"HH150",color,1)
+hline(lowest(150)[1],"LL150",color,1)
+hline(highest(200)[1],"HH200",color,1)
+hline(lowest(200)[1],"LL200",color,1)
